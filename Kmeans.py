@@ -17,7 +17,7 @@ def kmeans(Data,K,C):
     counter =0
     while not np.equal(currentClusterMeans,newClusterMeans).all():
         if counter !=0:
-            currentClusterMeans=np.copy(newClusterMeans)
+            currentClusterMeans=newClusterMeans
         newClusterMeans=np.zeros(C.shape)
         clusterSum=np.zeros(C.shape[0])
     #Assuming only one image is entered, the first dim is the no. of rows
@@ -47,7 +47,6 @@ def kmeans(Data,K,C):
         for p in range(0,img.shape[1]):
             finalClusteredImage[y][p]=newClusterMeans[(pixelClusterNo[y][p]).astype(int)]
        
-
     return finalClusteredImage  
 
 
