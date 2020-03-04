@@ -52,6 +52,7 @@ def kmeans(Data,K,C):
     return finalClusteredImage  
 
 
+# Generate synthetic images
 height = 512
 width = 512
 num_color_range = 256
@@ -73,7 +74,7 @@ plt.imsave("img1.png", img1, cmap='gray', vmin=0, vmax=255)
 plt.imsave("img5.png", img5, cmap='gray', vmin=0, vmax=255)
 plt.imsave("img1_testGrayImage_hi.png", img1_testGrayImage_hi, cmap='gray', vmin=0, vmax=255)
 plt.imsave("img5_testGrayImage_hi.png", img5_testGrayImage_hi, cmap='gray', vmin=0, vmax=255)
-
+######
 
 img = plt.imread("res/starg.jpg", format="jpg")
 
