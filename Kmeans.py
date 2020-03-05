@@ -110,5 +110,6 @@ groundtruthdata=groundtruth['Q3_GT']
 #print(np.unique(groundtruthdata))
 arrspec=randomClassMeanGenrator(imgdata,5,imgdata.shape[2])
 kmImage,clusterNoImage=kmeans(imgdata,5,arrspec)
+print(kmImage.shape)
 #print(imgdata.shape[2])
 
