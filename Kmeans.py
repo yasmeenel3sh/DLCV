@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import math
 import collections
 import sys
+from scipy.io import loadmat
+
 np.set_printoptions(threshold=sys.maxsize)
 
 def kmeans(Data,K,C):
@@ -52,22 +54,28 @@ def kmeans(Data,K,C):
 
 
 
-img = plt.imread("res/starg.jpg", format="jpg")
+img = plt.imread("res/star.jpg", format="jpg")
 
 #for rgb
-# arr=np.zeros((2,3))
-# arr[0]=np.array([255,0,0])
+# arr=np.zeros((4,3))
+# arr[0]=np.array([255,255,255])
 # arr[1]=np.array([0,255,0])
-#plt.imshow(km.astype(np.uint8))
-
+# arr[2]=np.array([255,165,0])
+# arr[3]=np.array([255,215,0])
+# km=kmeans(img,4,arr)
+# plt.imshow(km.astype(np.uint8))
+# plt.savefig("outputrgb.png")
 
 #for gray
-arr=np.zeros(2)
-arr[0]=20
-arr[1]=140
-km=kmeans(img,2,arr)
+# arrg=np.zeros(2)
+# arrg[0]=20
+# arrg[1]=140
+#km=kmeans(img,2,arrg)
+#plt.imshow(km.astype(np.uint8),cmap="gray")
+#plt.savefig("outputgray.png")
 
-plt.imshow(km.astype(np.uint8),cmap="gray")
-
-
-plt.savefig("output.png")
+#for spectral
+img= loadmat('res/SalinasLine.mat')
+print(img.keys())
+data = img['salinasA_corrected_line']
+print(data[0])
