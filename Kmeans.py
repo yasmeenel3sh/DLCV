@@ -21,8 +21,8 @@ def kmeans(Data,K,C):
     while not np.equal(currentClusterMeans,newClusterMeans).all():
         if counter !=0:
             currentClusterMeans=newClusterMeans
-        newClusterMeans=np.zeros(C.shape)
-        clusterSum=np.zeros(C.shape[0])
+        newClusterMeans=np.zeros(C.shape,dtype=np.float64)
+        clusterSum=np.zeros(C.shape[0],dtype=np.uint64)
     #Assuming only one image is entered, the first dim is the no. of rows
         #clustering the pixels
         for i in range(0,Data.shape[0]):
