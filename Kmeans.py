@@ -4,7 +4,7 @@ import math
 import collections
 import sys
 from scipy.io import loadmat
-
+import random
 import synthetic
 np.set_printoptions(threshold=sys.maxsize)
 
@@ -49,10 +49,20 @@ def kmeans(Data,K,C):
     for y in range(0,img.shape[0]):
         for p in range(0,img.shape[1]):
             finalClusteredImage[y][p]=newClusterMeans[(pixelClusterNo[y][p]).astype(int)]
-       
-    return finalClusteredImage  
+    #the finalclassImage is the clustered image each class has its mean color
+    #pixelclusterno is an image with each pixel representing its class number mostly used in the hyper spectral   
+    return finalClusteredImage , pixelClusterNo 
 
 
+#genrates initial means randomly
+def randomClassMeanGenrator(img,numberOfClasses,dim):
+    #gets all unique values used in the image sorted
+    uniqueValues=np.unique(img)
+    clusterMeansInitial=np.zeros((numberOfClasses,dim))
+    for i in range(0,numberOfClasses):
+        for j in range(0,dim):
+            clusterMeansInitial[i][j]=random.randint(uniqueValues[0],uniqueValues[-1])
+    return clusterMeansInitial
 # Generate synthetic images
 height = 512
 width = 512
@@ -77,28 +87,28 @@ plt.imsave("img1_testGrayImage_hi.png", img1_testGrayImage_hi, cmap='gray', vmin
 plt.imsave("img5_testGrayImage_hi.png", img5_testGrayImage_hi, cmap='gray', vmin=0, vmax=255)
 ######
 
-img = plt.imread("res/star.jpg", format="jpg")
-
 #for rgb
-# arr=np.zeros((4,3))
-# arr[0]=np.array([255,255,255])
-# arr[1]=np.array([0,255,0])
-# arr[2]=np.array([255,165,0])
-# arr[3]=np.array([255,215,0])
-# km=kmeans(img,4,arr)
-# plt.imshow(km.astype(np.uint8))
+# img = plt.imread("res/star.jpg", format="jpg")
+# arr=randomClassMeanGenrator(img,4,3)
+# kmImage,clusterNoImage=kmeans(img,4,arr)
+# plt.imshow(kmImage.astype(np.uint8))
 # plt.savefig("outputrgb.png")
 
 #for gray
-# arrg=np.zeros(2)
-# arrg[0]=20
-# arrg[1]=140
-#km=kmeans(img,2,arrg)
-#plt.imshow(km.astype(np.uint8),cmap="gray")
-#plt.savefig("outputgray.png")
+#img = plt.imread("res/starg.jpg", format="jpg")
+#arrg=randomClassMeanGenrator(img,2,1)
+# kmImage,clusterNoImage=kmeans(img,2,arrg)
+# plt.imshow(kmImage.astype(np.uint8),cmap="gray")
+# plt.savefig("outputgray.png")
 
 #for spectral
-img= loadmat('res/SalinasLine.mat')
-print(img.keys())
-data = img['salinasA_corrected_line']
-print(data[0])
+img= loadmat('res/SalinasA_Q3.mat')
+groundtruth=loadmat('res/SalinasA_GT3.mat')
+imgdata = img['Q3']
+groundtruthdata=groundtruth['Q3_GT']
+#[  0 182 219 237 255] it contains 5 unique classes not 7
+#print(np.unique(groundtruthdata))
+arrspec=randomClassMeanGenrator(imgdata,5,imgdata.shape[2])
+kmImage,clusterNoImage=kmeans(imgdata,5,arrspec)
+#print(imgdata.shape[2])
+
