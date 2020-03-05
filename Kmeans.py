@@ -3,12 +3,9 @@ import matplotlib.pyplot as plt
 import math
 import collections
 import sys
-<<<<<<< HEAD
 from scipy.io import loadmat
 
-=======
 import synthetic
->>>>>>> d5c2a155b719a4f690885a407f07a24e2ee4bf79
 np.set_printoptions(threshold=sys.maxsize)
 
 def kmeans(Data,K,C):
