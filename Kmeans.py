@@ -3,8 +3,12 @@ import matplotlib.pyplot as plt
 import math
 import collections
 import sys
+<<<<<<< HEAD
 from scipy.io import loadmat
 
+=======
+import synthetic
+>>>>>>> d5c2a155b719a4f690885a407f07a24e2ee4bf79
 np.set_printoptions(threshold=sys.maxsize)
 
 def kmeans(Data,K,C):
@@ -52,7 +56,29 @@ def kmeans(Data,K,C):
     return finalClusteredImage  
 
 
+# Generate synthetic images
+height = 512
+width = 512
+num_color_range = 256
 
+line1_start = (width/2) + int(width*.10)
+line1_range = int(width*.01)
+line2_start = (width/2) + int(width*.30)
+line2_range = int(width*.05)
+
+sigma = int(num_color_range / 6)
+noise_probability = 0.9
+
+img1 = synthetic.syn_quarter_image(height,width,num_color_range,0,0)
+img5 = synthetic.syn_image_lines(height,width,num_color_range,line1_start,line1_range,line2_start,line2_range,0,0)
+img1_testGrayImage_hi = synthetic.syn_quarter_image(height,width,num_color_range,sigma,noise_probability)
+img5_testGrayImage_hi = synthetic.syn_image_lines(height,width,num_color_range,line1_start,line1_range,line2_start,line2_range,sigma,noise_probability)
+
+plt.imsave("img1.png", img1, cmap='gray', vmin=0, vmax=255)
+plt.imsave("img5.png", img5, cmap='gray', vmin=0, vmax=255)
+plt.imsave("img1_testGrayImage_hi.png", img1_testGrayImage_hi, cmap='gray', vmin=0, vmax=255)
+plt.imsave("img5_testGrayImage_hi.png", img5_testGrayImage_hi, cmap='gray', vmin=0, vmax=255)
+######
 
 img = plt.imread("res/star.jpg", format="jpg")
 
