@@ -19,10 +19,11 @@ def kmeans(Data,K,C):
     #used to not update in the first iteration only
     counter =0
     while not np.equal(currentClusterMeans,newClusterMeans).all():
+        
         if counter !=0:
             currentClusterMeans=newClusterMeans
-        newClusterMeans=np.zeros(C.shape,dtype=np.float64)
-        clusterSum=np.zeros(C.shape[0],dtype=np.uint64)
+        newClusterMeans=np.zeros(C.shape)
+        clusterSum=np.zeros(C.shape[0])
     #Assuming only one image is entered, the first dim is the no. of rows
         #clustering the pixels
         for i in range(0,Data.shape[0]):
@@ -31,23 +32,30 @@ def kmeans(Data,K,C):
                 currentCluster= -1
                 for m in range(0,K):
                     distance= np.linalg.norm((Data[i][j]-currentClusterMeans[m]))
+                    #print(distance)
+                    if(np.isnan(distance)):
+                        #print(Data[i][j])
+                        #print(currentClusterMeans[m])
+                        quit()
                     if distance <= shortestPixelDistance:
                         currentCluster=m
                         pixelClusterNo[i][j]=currentCluster
                         shortestPixelDistance=distance
                 #updating clusterMeansTotal and sum
                 newClusterMeans[currentCluster]+=Data[i][j]
-                clusterSum[currentCluster]+=1        
+                clusterSum[currentCluster]+=1
+        #print(clusterSum)                
         #formulting the new cluster mean
         for x in range(0,newClusterMeans.shape[0]):
             newClusterMeans[x]=np.divide(newClusterMeans[x],clusterSum[x])
-        print(newClusterMeans)    
         counter+=1
+        print(newClusterMeans)
+        print(clusterSum)
+    finalClusteredImage=np.zeros(Data.shape)
 
-    finalClusteredImage=np.zeros(img.shape)
    
-    for y in range(0,img.shape[0]):
-        for p in range(0,img.shape[1]):
+    for y in range(0,Data.shape[0]):
+        for p in range(0,Data.shape[1]):
             finalClusteredImage[y][p]=newClusterMeans[(pixelClusterNo[y][p]).astype(int)]
     #the finalclassImage is the clustered image each class has its mean color
     #pixelclusterno is an image with each pixel representing its class number mostly used in the hyper spectral   
@@ -61,7 +69,7 @@ def randomClassMeanGenrator(img,numberOfClasses,dim):
     clusterMeansInitial=np.zeros((numberOfClasses,dim))
     for i in range(0,numberOfClasses):
         for j in range(0,dim):
-            clusterMeansInitial[i][j]=random.randint(uniqueValues[0],uniqueValues[-1])
+            clusterMeansInitial[i][j]=random.randint(1,uniqueValues[-1])
     return clusterMeansInitial
 # Generate synthetic images
 height = 512
@@ -105,11 +113,15 @@ plt.imsave("img5_testGrayImage_hi.png", img5_testGrayImage_hi, cmap='gray', vmin
 img= loadmat('res/SalinasA_Q3.mat')
 groundtruth=loadmat('res/SalinasA_GT3.mat')
 imgdata = img['Q3']
+
 groundtruthdata=groundtruth['Q3_GT']
 #[  0 182 219 237 255] it contains 5 unique classes not 7
 #print(np.unique(groundtruthdata))
 arrspec=randomClassMeanGenrator(imgdata,5,imgdata.shape[2])
+#print(arrspec)
 kmImage,clusterNoImage=kmeans(imgdata,5,arrspec)
-print(kmImage.shape)
-#print(imgdata.shape[2])
+
+# print(kmImage.shape)
+# print(imgdata.shape[2])
+
 
