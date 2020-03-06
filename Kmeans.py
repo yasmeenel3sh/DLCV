@@ -6,12 +6,11 @@ import sys
 from scipy.io import loadmat
 import random
 import synthetic
-from sklearn.cluster import KMeans
 import confusion
 
 np.set_printoptions(threshold=sys.maxsize)
 
-def kmeansX(Data,K,C):
+def kmeans(Data,K,C):
     #Data array, k classes, C means for classes
     #the following step to know the dimensions of the data
     dimSize=len(Data.shape)
@@ -179,88 +178,18 @@ noise_probability = 0.9
 img= loadmat('res/SalinasA_Q3.mat')
 groundtruth=loadmat('res/SalinasA_GT3.mat')
 imgdata = img['Q3']
-#print(imgdata)
-
-
 imgdata = (imgdata / np.max(imgdata)) * 255
-imgdatak = np.reshape(imgdata, (imgdata.shape[0] * imgdata.shape[1], imgdata.shape[2]))
-
-kmeans = KMeans(n_clusters=5)
-kmeans.fit(imgdatak)
-cl=kmeans.cluster_centers_
-
 groundtruthdata=groundtruth['Q3_GT']
 #[  0 182 219 237 255] it contains 5 unique classes not 7
-# print(groundtruthdata[5])
 arrspec =np.zeros((5,204))
-arrspec[0]=cl[0]
-arrspec[1]=cl[1]
-arrspec[2]=cl[2]
-arrspec[3]=cl[3]
-arrspec[4]=cl[4]
-# arrspec=randomClassMeanGenrator(imgdata,5,imgdata.shape[2])
 arrspec=choose_initial_cluster_centers(imgdata,5,imgdata.shape[2])
-# print(arrspec)
-
-# for i in range(arrspec.shape[0]):
-#     for j in range(i+1,arrspec.shape[0]):
-#         print(str(i) + " " + str(j))
-#         print((arrspec[j] == arrspec[i]).all())
-
-
-
-
-kmImage,clusterNoImage,newClusterMeans= kmeansX(imgdata,5,arrspec)
+kmImage,clusterNoImage,newClusterMeans= kmeans(imgdata,5,arrspec)
 
 predict, labels = map_classes(clusterNoImage, groundtruthdata, 5)
 
-# reIndexed=np.zeros(clusterNoImage.shape)
-# norms=np.zeros(5)
-# for i in range(5):
-#     norms[i]=np.linalg.norm(newClusterMeans[i]) 
-# normssorted=np.unique(norms)
-# uniqueTruthvalues=np.unique(groundtruthdata)    
-# # print(normssorted)
-# # print(uniqueTruthvalues)
-# for j in range(0,clusterNoImage.shape[0]):
-#     for k in range(0,clusterNoImage.shape[1]):
-#         classNumber=clusterNoImage[j][k]
-#         classMeanNorm=norms[(classNumber).astype(int)]
-#         toBeAddedClassNo=uniqueTruthvalues[np.where(normssorted==classMeanNorm)]
-#         reIndexed[j][k]=toBeAddedClassNo
-# print(reIndexed[5])
-# print(groundtruthdata[0])
-# print(clusterNoImage[0])
-# print(groundtruthdata[0])
-# print(kmImage.shape)
-# print(imgdata.shape[2])
-
-plt.figure()
 plt.imshow(clusterNoImage.astype(np.uint8))
-plt.savefig("number.png")
+plt.savefig("hyperSpectralClustered.png")
 
-# plt.imshow(reIndexed.astype(np.uint8))
-# plt.savefig("number4.png")
-
-# plt.figure()
-# plt.imshow(groundtruthdata.astype(np.uint8))
-# plt.savefig("number2.png")
-
-
-# from sklearn.cluster import KMeans
-
-# plt.scatter(imgdata[:,0],imgdata[:,1], label='True Position')
-
-# print(img['Q3'])
-
-# kmeans = KMeans(n_clusters=5)
-# kmeans.fit(imgdata)
-# print(kmeans.cluster_centers_)
-# print(kmeans.labels_)
-
-# plt.figure()
-# plt.imshow(np.reshape(kmeans.labels_,(42,43)).astype(np.uint8))
-# plt.savefig("number3.png")
 
 cm, acc = confusion.confusion_matrix_compute(predict,labels)
 print(acc)
