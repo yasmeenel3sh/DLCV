@@ -95,6 +95,35 @@ def choose_initial_cluster_centers(points, clusters, dim):
 
     return us
 
+def map_classes(clustered_data, labeled_data, num_classes):
+    indicies = []
+    predict = clustered_data.copy()
+    labels = labeled_data.copy()
+    
+    all_counts = []
+    for i in range(num_classes):
+        counts = []
+        uniqueTruthvalues=np.unique(labeled_data)
+        unique, counts = np.unique(clustered_data[np.where(labeled_data == uniqueTruthvalues[i])], return_counts=True)
+        counts = dict(zip(unique, counts))
+        for k in range(num_classes):
+            if k not in counts.keys():
+                counts[k] = 0
+        keys = sorted(counts.keys())
+        counts_list = []
+        for key in keys:
+            counts_list.append(counts[key])
+
+        all_counts.append(counts_list)
+    
+    all_counts = np.array(all_counts)
+
+    for i in range(num_classes):
+        labels[labeled_data == uniqueTruthvalues[np.where(all_counts[0:,i:(i+1)] == np.amax(all_counts[0:,i:(i+1)]))[0][0]]] = i-(num_classes - 1)
+
+    labels += 4
+
+    return predict, labels
 
 #genrates initial means randomly
 def randomClassMeanGenrator(img,numberOfClasses,dim):
@@ -162,7 +191,7 @@ cl=kmeans.cluster_centers_
 
 groundtruthdata=groundtruth['Q3_GT']
 #[  0 182 219 237 255] it contains 5 unique classes not 7
-print(groundtruthdata[5])
+# print(groundtruthdata[5])
 arrspec =np.zeros((5,204))
 arrspec[0]=cl[0]
 arrspec[1]=cl[1]
@@ -178,20 +207,29 @@ arrspec=choose_initial_cluster_centers(imgdata,5,imgdata.shape[2])
 #         print(str(i) + " " + str(j))
 #         print((arrspec[j] == arrspec[i]).all())
 
+
+
+
 kmImage,clusterNoImage,newClusterMeans= kmeansX(imgdata,5,arrspec)
-reIndexed=np.zeros(clusterNoImage.shape)
-norms=np.zeros(5)
-for i in range(5):
-    norms[i]=np.linalg.norm(newClusterMeans[i]) 
-normssorted=np.unique(norms)
-uniqueTruthvalues=np.unique(groundtruthdata)    
-for j in range(0,clusterNoImage.shape[0]):
-    for k in range(0,clusterNoImage.shape[1]):
-        classNumber=clusterNoImage[j][k]
-        classMeanNorm=norms[(classNumber).astype(int)]
-        toBeAddedClassNo=uniqueTruthvalues[np.where(normssorted==classMeanNorm)]
-        reIndexed[j][k]=toBeAddedClassNo
-print(reIndexed[5])
+
+predict, labels = map_classes(clusterNoImage, groundtruthdata, 5)
+
+# reIndexed=np.zeros(clusterNoImage.shape)
+# norms=np.zeros(5)
+# for i in range(5):
+#     norms[i]=np.linalg.norm(newClusterMeans[i]) 
+# normssorted=np.unique(norms)
+# uniqueTruthvalues=np.unique(groundtruthdata)    
+# # print(normssorted)
+# # print(uniqueTruthvalues)
+# for j in range(0,clusterNoImage.shape[0]):
+#     for k in range(0,clusterNoImage.shape[1]):
+#         classNumber=clusterNoImage[j][k]
+#         classMeanNorm=norms[(classNumber).astype(int)]
+#         toBeAddedClassNo=uniqueTruthvalues[np.where(normssorted==classMeanNorm)]
+#         reIndexed[j][k]=toBeAddedClassNo
+# print(reIndexed[5])
+# print(groundtruthdata[0])
 # print(clusterNoImage[0])
 # print(groundtruthdata[0])
 # print(kmImage.shape)
@@ -201,8 +239,8 @@ plt.figure()
 plt.imshow(clusterNoImage.astype(np.uint8))
 plt.savefig("number.png")
 
-plt.imshow(reIndexed.astype(np.uint8))
-plt.savefig("number4.png")
+# plt.imshow(reIndexed.astype(np.uint8))
+# plt.savefig("number4.png")
 
 # plt.figure()
 # plt.imshow(groundtruthdata.astype(np.uint8))
@@ -220,10 +258,10 @@ plt.savefig("number4.png")
 # print(kmeans.cluster_centers_)
 # print(kmeans.labels_)
 
-plt.figure()
-plt.imshow(np.reshape(kmeans.labels_,(42,43)).astype(np.uint8))
-plt.savefig("number3.png")
+# plt.figure()
+# plt.imshow(np.reshape(kmeans.labels_,(42,43)).astype(np.uint8))
+# plt.savefig("number3.png")
 
-
-cm = confusion.confusion_matrix_compute(reIndexed,groundtruthdata)
+cm, acc = confusion.confusion_matrix_compute(predict,labels)
+print(acc)
 confusion.confusion_matrix_save(cm)

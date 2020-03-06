@@ -10,12 +10,19 @@ def confusion_matrix_compute(predicts, labels):
 
     cm = np.zeros((num_classes,num_classes))
 
+    accuracy = 0
+
     for i in range(predicts_flat.shape[0]):
         predict = int(predicts_flat[i])
         label = int(labels_flat[i])
         cm[label:label+1, predict:predict+1] += 1
+        
+        if label == predict:
+            accuracy += 1
 
-    return cm
+    accuracy = round(accuracy / len(labels_flat),4)
+
+    return cm, accuracy
 
 def confusion_matrix_save(cm, path=''):
     plt.figure()
