@@ -166,7 +166,7 @@ def generate_syn_images():
 img1, img5, img1_testGrayImage_hi, img5_testGrayImage_hi = generate_syn_images()
 
 ############ 2- Compute K-means ############
-img1
+# img1
 img = Image.open("img1.png").convert('L')
 img = np.array(img,dtype='uint8')
 
@@ -231,16 +231,18 @@ img = plt.imread("res/star.jpg", format="jpg")
 print(img.shape)
 arr=randomClassMeanGenrator(img,4,3)
 kmImage,clusterNoImage,newClusterMeans=kmeans(img,4,arr)
+plt.figure()
 plt.imshow(kmImage.astype(np.uint8))
-plt.savefig("outputrgb.png")
+plt.savefig("kmeanoutputrgb.png")
 
 #for gray
 img = plt.imread("res/starg.jpg", format="jpg")
 print(img.shape)
 arrg=randomClassMeanGenrator(img,2,1)
 kmImage,clusterNoImage,newClusterMeans=kmeans(img,2,arrg)
+plt.figure()
 plt.imshow(kmImage.astype(np.uint8),cmap="gray")
-plt.savefig("outputgray.png")
+plt.savefig("kmeanoutputgray.png")
 
 
 ############ 4- K means for spectral image ############
