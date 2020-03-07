@@ -7,6 +7,7 @@ from scipy.io import loadmat
 import random
 import synthetic
 import confusion
+from PIL import Image
 
 np.set_printoptions(threshold=sys.maxsize)
 
@@ -66,7 +67,7 @@ def kmeans(Data,K,C):
 
 
 def choose_initial_cluster_centers(points, clusters, dim):
-    points = np.reshape(points,((42*43),points.shape[2]))
+    points = np.reshape(points,((points.shape[0]*points.shape[1]),dim))
     us = np.zeros((clusters,dim))         # centers of each cluster
     indicies = np.zeros(clusters)
 
@@ -120,7 +121,7 @@ def map_classes(clustered_data, labeled_data, num_classes):
     for i in range(num_classes):
         labels[labeled_data == uniqueTruthvalues[np.where(all_counts[0:,i:(i+1)] == np.amax(all_counts[0:,i:(i+1)]))[0][0]]] = i-(num_classes - 1)
 
-    labels += 4
+    labels += num_classes-1
 
     return predict, labels
 
@@ -133,54 +134,123 @@ def randomClassMeanGenrator(img,numberOfClasses,dim):
         for j in range(0,dim):
             clusterMeansInitial[i][j]=random.randint(1,uniqueValues[-1])
     return clusterMeansInitial
+
 # Generate synthetic images
-height = 512
-width = 512
-num_color_range = 256
+def generate_syn_images():
+    height = 512
+    width = 512
+    num_color_range = 256
 
-line1_start = (width/2) + int(width*.10)
-line1_range = int(width*.01)
-line2_start = (width/2) + int(width*.30)
-line2_range = int(width*.05)
+    line1_start = (width/2) + int(width*.10)
+    line1_range = int(width*.01)
+    line2_start = (width/2) + int(width*.30)
+    line2_range = int(width*.05)
 
-sigma = int(num_color_range / 6)
-noise_probability = 0.9
+    sigma = int(num_color_range / 6)
+    noise_probability = 0.9
 
-# img1 = synthetic.syn_quarter_image(height,width,num_color_range,0,0)
-# img5 = synthetic.syn_image_lines(height,width,num_color_range,line1_start,line1_range,line2_start,line2_range,0,0)
-# img1_testGrayImage_hi = synthetic.syn_quarter_image(height,width,num_color_range,sigma,noise_probability)
-# img5_testGrayImage_hi = synthetic.syn_image_lines(height,width,num_color_range,line1_start,line1_range,line2_start,line2_range,sigma,noise_probability)
+    img1 = synthetic.syn_quarter_image(height,width,num_color_range,0,0)
+    img5 = synthetic.syn_image_lines(height,width,num_color_range,line1_start,line1_range,line2_start,line2_range,0,0)
+    img1_testGrayImage_hi = synthetic.syn_quarter_image(height,width,num_color_range,sigma,noise_probability)
+    img5_testGrayImage_hi = synthetic.syn_image_lines(height,width,num_color_range,line1_start,line1_range,line2_start,line2_range,sigma,noise_probability)
 
-# plt.imsave("img1.png", img1, cmap='gray', vmin=0, vmax=255)
-# plt.imsave("img5.png", img5, cmap='gray', vmin=0, vmax=255)
-# plt.imsave("img1_testGrayImage_hi.png", img1_testGrayImage_hi, cmap='gray', vmin=0, vmax=255)
-# plt.imsave("img5_testGrayImage_hi.png", img5_testGrayImage_hi, cmap='gray', vmin=0, vmax=255)
+    plt.imsave("img1.png", img1, cmap='gray', vmin=0, vmax=255)
+    plt.imsave("img5.png", img5, cmap='gray', vmin=0, vmax=255)
+    plt.imsave("img1_testGrayImage_hi.png", img1_testGrayImage_hi, cmap='gray', vmin=0, vmax=255)
+    plt.imsave("img5_testGrayImage_hi.png", img5_testGrayImage_hi, cmap='gray', vmin=0, vmax=255)
+
+    return img1, img5, img1_testGrayImage_hi, img5_testGrayImage_hi
 ######
 
+# 1- Create synthetic images
+img1, img5, img1_testGrayImage_hi, img5_testGrayImage_hi = generate_syn_images()
+
+############ 2- Compute K-means ############
+img1
+img = Image.open("img1.png").convert('L')
+img = np.array(img,dtype='uint8')
+
+arrs=choose_initial_cluster_centers(img,4,1)
+kmImage,clusterNoImage,newClusterMeans=kmeans(img,4,arrs)
+plt.imshow(kmImage.astype(np.uint8),cmap="gray")
+plt.savefig("img1_kmeans.png")
+
+predict, labels = map_classes(clusterNoImage, img1, 4)
+
+cm, acc = confusion.confusion_matrix_compute(predict,labels,4)
+print("K-means for img1: " + str(acc))
+confusion.confusion_matrix_save(cm,name="cm_img1_kmeans.png")
+
+# img5
+img = Image.open("img5.png").convert('L')
+img = np.array(img,dtype='uint8')
+
+arrs=choose_initial_cluster_centers(img,4,1)
+kmImage,clusterNoImage,newClusterMeans=kmeans(img,4,arrs)
+plt.imshow(kmImage.astype(np.uint8),cmap="gray")
+plt.savefig("img5_kmeans.png")
+
+predict, labels = map_classes(clusterNoImage, img5, 4)
+
+cm, acc = confusion.confusion_matrix_compute(predict,labels,4)
+print("K-means for img5: " + str(acc))
+confusion.confusion_matrix_save(cm,name="cm_img5_kmeans.png")
+
+# img1_noise
+img = Image.open("img1_testGrayImage_hi.png").convert('L')
+img = np.array(img,dtype='uint8')
+
+arrs=choose_initial_cluster_centers(img,4,1)
+kmImage,clusterNoImage,newClusterMeans=kmeans(img,4,arrs)
+plt.imshow(kmImage.astype(np.uint8),cmap="gray")
+plt.savefig("img1_noise_kmeans.png")
+
+predict, labels = map_classes(clusterNoImage, img1_testGrayImage_hi, 4)
+
+cm, acc = confusion.confusion_matrix_compute(predict,labels,4)
+print("K-means for img1_noise: " + str(acc))
+confusion.confusion_matrix_save(cm,name="cm_img1_noise_kmeans.png")
+
+# img5_noise
+img = Image.open("img5_testGrayImage_hi.png").convert('L')
+img = np.array(img,dtype='uint8')
+
+arrs=choose_initial_cluster_centers(img,4,1)
+kmImage,clusterNoImage,newClusterMeans=kmeans(img,4,arrs)
+plt.imshow(kmImage.astype(np.uint8),cmap="gray")
+plt.savefig("img5_noise_kmeans.png")
+
+predict, labels = map_classes(clusterNoImage, img5_testGrayImage_hi, 4)
+
+cm, acc = confusion.confusion_matrix_compute(predict,labels,4)
+print("K-means for img5_noise: " + str(acc))
+confusion.confusion_matrix_save(cm,name="cm_img5_noise_kmeans.png")
+
 #for rgb
-# img = plt.imread("res/star.jpg", format="jpg")
-# print(img.shape)
-# arr=randomClassMeanGenrator(img,4,3)
-# kmImage,clusterNoImage,newClusterMeans=kmeans(img,4,arr)
-# plt.imshow(kmImage.astype(np.uint8))
-# plt.savefig("outputrgb.png")
+img = plt.imread("res/star.jpg", format="jpg")
+print(img.shape)
+arr=randomClassMeanGenrator(img,4,3)
+kmImage,clusterNoImage,newClusterMeans=kmeans(img,4,arr)
+plt.imshow(kmImage.astype(np.uint8))
+plt.savefig("outputrgb.png")
 
 #for gray
-# img = plt.imread("res/starg.jpg", format="jpg")
-# print(img.shape)
-# arrg=randomClassMeanGenrator(img,2,1)
-# kmImage,clusterNoImage,newClusterMeans=kmeans(img,2,arrg)
-# plt.imshow(kmImage.astype(np.uint8),cmap="gray")
-# plt.savefig("outputgray.png")
+img = plt.imread("res/starg.jpg", format="jpg")
+print(img.shape)
+arrg=randomClassMeanGenrator(img,2,1)
+kmImage,clusterNoImage,newClusterMeans=kmeans(img,2,arrg)
+plt.imshow(kmImage.astype(np.uint8),cmap="gray")
+plt.savefig("outputgray.png")
 
 
+############ 4- K means for spectral image ############
 #for spectral
 img= loadmat('res/SalinasA_Q3.mat')
 groundtruth=loadmat('res/SalinasA_GT3.mat')
 imgdata = img['Q3']
 imgdata = (imgdata / np.max(imgdata)) * 255
 groundtruthdata=groundtruth['Q3_GT']
-#[  0 182 219 237 255] it contains 5 unique classes not 7
+# #[  0 182 219 237 255] it contains 5 unique classes not 7
 arrspec =np.zeros((5,204))
 arrspec=choose_initial_cluster_centers(imgdata,5,imgdata.shape[2])
 kmImage,clusterNoImage,newClusterMeans= kmeans(imgdata,5,arrspec)
@@ -190,7 +260,6 @@ predict, labels = map_classes(clusterNoImage, groundtruthdata, 5)
 plt.imshow(clusterNoImage.astype(np.uint8))
 plt.savefig("hyperSpectralClustered.png")
 
-
-cm, acc = confusion.confusion_matrix_compute(predict,labels)
-print(acc)
-confusion.confusion_matrix_save(cm)
+cm, acc = confusion.confusion_matrix_compute(predict,labels,5)
+print("K-means for spectral: " + str(acc))
+confusion.confusion_matrix_save(cm, name="cm_spectral.png")

@@ -2,11 +2,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def confusion_matrix_compute(predicts, labels):
+def confusion_matrix_compute(predicts, labels, num_classes):
     
     predicts_flat = predicts.flatten()
     labels_flat = labels.flatten()
-    num_classes = 5
 
     cm = np.zeros((num_classes,num_classes))
 
@@ -24,7 +23,7 @@ def confusion_matrix_compute(predicts, labels):
 
     return cm, accuracy
 
-def confusion_matrix_save(cm, path=''):
+def confusion_matrix_save(cm, path='', name='Confusion.png'):
     plt.figure()
     plt.imshow(cm)
     plt.title("Confusion Matrix")
@@ -35,7 +34,7 @@ def confusion_matrix_save(cm, path=''):
         for j in range(cm.shape[0]):
             plt.text(j, i, int(cm[i, j]), ha="center", va="center", color="w")
 
-    plt.savefig(path + 'Confusion.png')
+    plt.savefig(path + name)
 
 # cm = np.array([[0,1], [2,3]])
 # l = np.array([[0,1], [2,3]])
