@@ -9,7 +9,17 @@ import synthetic
 import confusion
 from PIL import Image
 
+# Yasmeen Khaled		37-6614		yasmeen.abdelmohsen@student.guc.edu.eg
+# Michael George		37-3063		michael.khalil@student.guc.edu.eg
+# Olfat Mostafa		37-19029	olfat.aaf@student.guc.edu.eg
+
+
 np.set_printoptions(threshold=sys.maxsize)
+
+
+# Yasmeen Khaled		37-6614		yasmeen.abdelmohsen@student.guc.edu.eg
+# Michael George		37-3063		michael.khalil@student.guc.edu.eg
+# Olfat Mostafa		37-19029	olfat.aaf@student.guc.edu.eg
 
 def kmeans(Data,K,C):
     #Data array, k classes, C means for classes
@@ -118,6 +128,10 @@ def map_classes(clustered_data, labeled_data, num_classes):
     
     all_counts = np.array(all_counts)
 
+    print(all_counts)
+    print(uniqueTruthvalues)
+    print(labeled_data[0])
+    print(labeled_data[500])
     for i in range(num_classes):
         labels[labeled_data == uniqueTruthvalues[np.where(all_counts[0:,i:(i+1)] == np.amax(all_counts[0:,i:(i+1)]))[0][0]]] = i-(num_classes - 1)
 

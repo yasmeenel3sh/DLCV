@@ -2,6 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import random
 
+# Yasmeen Khaled		37-6614		yasmeen.abdelmohsen@student.guc.edu.eg
+# Michael George		37-3063		michael.khalil@student.guc.edu.eg
+# Olfat Mostafa		37-19029	olfat.aaf@student.guc.edu.eg
+
 
 # Generate an image with 4 quarters. Given a color range, the function splits the range 
 # into 4 pixel values that used to be assigned to each quarter in the image.

@@ -2,6 +2,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+# Yasmeen Khaled		37-6614		yasmeen.abdelmohsen@student.guc.edu.eg
+# Michael George		37-3063		michael.khalil@student.guc.edu.eg
+# Olfat Mostafa		37-19029	olfat.aaf@student.guc.edu.eg
+
+
 def confusion_matrix_compute(predicts, labels, num_classes):
     
     predicts_flat = predicts.flatten()
